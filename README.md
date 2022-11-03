@@ -7,7 +7,7 @@
 
 - Add bcrypt and rack-cors to gemfile
 
-```#Gemfile
-gem 'bcrypt'
-gem 'rack-cors'
-```
+    ```#Gemfile
+    gem 'bcrypt'
+    gem 'rack-cors'
+    ```
