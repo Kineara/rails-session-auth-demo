@@ -1,24 +1,11 @@
-# README
+# Rails Session Authorization Demo
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Notes 
+- Use ```rails new``` to set up new application, without the ```--api``` flag
+    ```rails new rails-session-auth-demo --database=postgresql```
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+- Add bcrypt and rack-cors to gemfile
+```#Gemfile
+gem 'bcrypt'
+gem 'rack-cors'
+```
