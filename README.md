@@ -1,6 +1,10 @@
 # Rails Session Authorization Demo
 
+- Credit to https://medium.com/how-i-get-it/react-with-rails-user-authentication-8977e98762f2 for the original tutorial
+
 ## Notes
+
+### Rails initial setup
 
 - Use `rails new` to set up new application, without the `--api` flag
 
@@ -49,3 +53,30 @@
   port ENV.fetch("PORT") { 3001 }
   ...
   ```
+
+### User Model
+
+- Create User model and migrate database
+
+  ```
+  rails g model User username email password_digest
+
+  rake db:create && rake db:migrate
+  ```
+
+- Update User model with has_secure_password attribute and basic validations
+
+  ```
+  class User < ApplicationRecord
+  has_secure_password
+  validates :username, presence: true
+  validates :username, uniqueness: true
+  validates :username, length: { minimum: 4 }
+  validates :email, presence: true
+  validates :email, uniqueness: true
+  validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\z/i
+  end
+  ```
+
+
+
