@@ -12,7 +12,7 @@
 
 - Add bcrypt and rack-cors to gemfile and run `bundle` to install
 
-  ```
+  ```ruby
   # Gemfile
   gem 'bcrypt'
   gem 'rack-cors'
@@ -20,7 +20,7 @@
 
 - Create a new file called `cors.rb` in `config/initializers` and add the following:
 
-  ```
+  ```ruby
   Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     origins 'http://localhost:3000'
@@ -35,7 +35,7 @@
 
 - Create a new file called `session_store.rb` in `config/initializers` and add the following:
 
-  ```
+  ```ruby
   if Rails.env === 'production'
     Rails.application.config.session_store :cookie_store, key: '_rails-session-auth-demo', domain: 'your-frontend-domain'
   else
@@ -47,7 +47,7 @@
 
 - Update Puma to run on a different port than the front end
 
-  ```
+  ```ruby
   #config/puma.rb
   ...
   port ENV.fetch("PORT") { 3001 }
@@ -58,7 +58,7 @@
 
 - Create User model and migrate database
 
-  ```
+  ```ruby
   rails g model User username email password_digest
 
   rake db:create && rake db:migrate
@@ -66,7 +66,7 @@
 
 - Update User model with has_secure_password attribute and basic validations
 
-  ```
+  ```ruby
   # app/models/user.rb
 
   class User < ApplicationRecord
@@ -82,7 +82,7 @@
 
 - Add routes
 
-  ```
+  ```ruby
   # config/routes.rb
   Rails.application.routes.draw do
     resources :users, only: [:create, :show, :index]
@@ -91,7 +91,7 @@
 
 - Create `users_controller.rb` and add basic methods
 
-  ```
+  ```ruby
   # app/controllers/users_controller.rb
 
   class UsersController < ApplicationController
@@ -147,7 +147,7 @@
 
 - Update `application_controller.rb` with helper methods
 
-  ```
+  ```ruby
   class ApplicationController < ActionController::Base
   skip_before_action :verify_authenticity_token
   helper_method :login!, :logged_in?, :current_user, :authorized_user?, :logout!
@@ -171,7 +171,7 @@
 
   - Create Sessions Controller and update routes
 
-  ```
+  ```ruby
   class SessionsController < ApplicationController
   def create
     @user = User.find_by(email: session_params[:email])
@@ -216,7 +216,7 @@
   end
   ```
 
-  ```
+  ```ruby
   Rails.application.routes.draw do
     post '/login', to: 'sessions#create'
     delete '/logout', to: 'sessions#destroy'
@@ -225,3 +225,42 @@
     resources :users, only: [:create, :show, :index]
   end
   ```
+
+## React Setup
+
+- From the root directory, create the application template
+
+  ```bash
+  npx-create-react-app client && cd client
+  ```
+
+- Clean up the template:
+
+```js
+// src/App.js
+
+import React from 'react';
+function App() {
+  return (
+   <div>
+     
+   </div>
+  );
+}
+export default App;
+```
+
+```js
+// src/index.js
+
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+- Add dependencies:
+
+```bash
+  yarn add axios && yarn add react-router && yarn add react-router-dom
+```
