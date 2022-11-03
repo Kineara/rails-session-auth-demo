@@ -29,23 +29,23 @@
   end
   ```
 
-  - Create a new file called `session_store.rb` in `config/initializers` and add the following:
+- Create a new file called `session_store.rb` in `config/initializers` and add the following:
 
-    ```
-    if Rails.env === 'production'
-      Rails.application.config.session_store :cookie_store, key: '_rails-session-auth-demo', domain: 'your-frontend-domain'
-    else
-      Rails.application.config.session_store :cookie_store, key: '_rails-session-auth-demo'
-    end
-    ```
+  ```
+  if Rails.env === 'production'
+    Rails.application.config.session_store :cookie_store, key: '_rails-session-auth-demo', domain: 'your-frontend-domain'
+  else
+    Rails.application.config.session_store :cookie_store, key: '_rails-session-auth-demo'
+  end
+  ```
 
-    Set the key name to an underscore followed by your app name
+  Set the key name to an underscore followed by your app name
 
-  - Update Puma to run on a different port than the front end
+- Update Puma to run on a different port than the front end
 
-    ```
-    #config/puma.rb
-    ...
-    port ENV.fetch("PORT") { 3001 }
-    ...
-    ```
+  ```
+  #config/puma.rb
+  ...
+  port ENV.fetch("PORT") { 3001 }
+  ...
+  ```
