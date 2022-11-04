@@ -14,6 +14,7 @@
 
   ```ruby
   # Gemfile
+
   gem 'bcrypt'
   gem 'rack-cors'
   ```
@@ -58,8 +59,6 @@
   port ENV.fetch("PORT") { 3001 }
   ...
   ```
-
-### User Model
 
 - Create User model and migrate database
 
@@ -180,7 +179,7 @@
   - Create Sessions Controller and update routes
 
   ```ruby
-  # app/controllers/sessions_controller
+  # app/controllers/sessions_controller.rb
 
   class SessionsController < ApplicationController
   def create
@@ -228,7 +227,7 @@
 
   ```ruby
   # app/config/routes.rb
-  
+
   Rails.application.routes.draw do
     post '/login', to: 'sessions#create'
     delete '/logout', to: 'sessions#destroy'
