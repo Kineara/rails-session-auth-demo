@@ -232,7 +232,7 @@
     post '/login', to: 'sessions#create'
     delete '/logout', to: 'sessions#destroy'
     get '/logged_in', to: 'sessions#is_logged_in?'
-    
+
     resources :users, only: [:create, :show, :index]
   end
   ```
@@ -250,13 +250,9 @@
 ```js
 // src/App.js
 
-import React from 'react';
+import React from "react";
 function App() {
-  return (
-   <div>
-     
-   </div>
-  );
+  return <div></div>;
 }
 export default App;
 ```
@@ -264,14 +260,516 @@ export default App;
 ```js
 // src/index.js
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-ReactDOM.render(<App />, document.getElementById('root'));
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+ReactDOM.render(<App />, document.getElementById("root"));
 ```
 
 - Add dependencies:
 
 ```bash
   yarn add axios && yarn add react-router && yarn add react-router-dom
+```
+
+## App Logic
+
+- Update App.js to serve as the router and to store the user's logged in state
+
+```jsx
+// client/src/App.js
+
+import React, { Component } from 'react';
+import axios from 'axios'
+import {BrowserRouter, Switch, Route} from 'react-router-dom'
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoggedIn: false,
+      user: {}
+     };
+  }
+  render() {
+    return (
+      <div>
+         <BrowserRouter>
+          <Switch>
+            <Route exact path='/' component={}/>
+            <Route exact path='/login' component={}/>
+            <Route exact path='/signup' component={}/>
+          </Switch>
+        </BrowserRouter>
+      </div>
+    );
+  }
+}
+export default App;
+```
+
+- Add handleLogin and handleLogout methods
+
+```jsx
+// client/src/App.js
+
+handleLogin = (data) => {
+  this.setState({
+    isLoggedIn: true,
+    user: data.user,
+  });
+};
+handleLogout = () => {
+  this.setState({
+    isLoggedIn: false,
+    user: {},
+  });
+};
+```
+
+- Add a loginStatus method to get the user's login status, passing the {withCredentials: true} argument to allow Rails to set and read the cookie on the front end's browser
+
+```jsx
+// client/src/App.js
+
+loginStatus = () => {
+  axios
+    .get("http://localhost:3001/logged_in", { withCredentials: true })
+    .then((response) => {
+      if (response.data.logged_in) {
+        this.handleLogin(response);
+      } else {
+        this.handleLogout();
+      }
+    })
+    .catch((error) => console.log("api errors:", error));
+};
+```
+
+- Add a method to request the login status every time the component is first mounted
+
+```jsx
+// client/src/App.js
+componentDidMount() {
+    this.loginStatus()
+  }
+```
+
+- Create the Home component
+
+```jsx
+// client/src/components/Home.js
+
+import React from 'react';
+import {Link} from 'react-router-dom'
+const Home = () => {
+  return (
+    <div>
+      <Link to='/login'>Log In</Link>
+      <br></br>
+      <Link to='/signup'>Sign Up</Link>
+    </div>
+  );
+};
+export default Home;
+```
+
+- Create the Login and Signup components
+
+```jsx
+// client/src/components/registrations/Login.js
+
+import React, { Component } from 'react';
+import axios from 'axios'
+import {Link} from 'react-router-dom'
+class Login extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { 
+      username: '',
+      email: '',
+      password: '',
+      errors: ''
+     };
+  }
+handleChange = (event) => {
+    const {name, value} = event.target
+    this.setState({
+      [name]: value
+    })
+  };
+handleSubmit = (event) => {
+    event.preventDefault()
+  };
+render() {
+    const {username, email, password} = this.state
+return (
+      <div>
+        <h1>Log In</h1>
+        <form onSubmit={this.handleSubmit}>
+          <input
+            placeholder="username"
+            type="text"
+            name="username"
+            value={username}
+            onChange={this.handleChange}
+          />
+          <input
+            placeholder="email"
+            type="text"
+            name="email"
+            value={email}
+            onChange={this.handleChange}
+          />
+          <input
+            placeholder="password"
+            type="password"
+            name="password"
+            value={password}
+            onChange={this.handleChange}
+          />
+         <button placeholder="submit" type="submit">
+            Log In
+          </button>
+          <div>
+            or <Link to='/signup'>sign up</Link>
+          </div>
+          
+         </form>
+      </div>
+    );
+  }
+}
+export default Login;
+```
+
+```jsx
+// client/src/components/registrations/Signup.js
+
+import React, { Component } from 'react';
+import axios from 'axios'
+class Signup extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { 
+      username: '',
+      email: '',
+      password: '',
+      password_confirmation: '',
+      errors: ''
+     };
+  }
+handleChange = (event) => {
+    const {name, value} = event.target
+    this.setState({
+      [name]: value
+    })
+  };
+handleSubmit = (event) => {
+    event.preventDefault()
+  };
+render() {
+    const {username, email, password, password_confirmation} = this.state
+return (
+      <div>
+        <h1>Sign Up</h1>
+        <form onSubmit={this.handleSubmit}>
+          <input
+            placeholder="username"
+            type="text"
+            name="username"
+            value={username}
+            onChange={this.handleChange}
+          />
+          <input
+            placeholder="email"
+            type="text"
+            name="email"
+            value={email}
+            onChange={this.handleChange}
+          />
+          <input 
+            placeholder="password"
+            type="password"
+            name="password"
+            value={password}
+            onChange={this.handleChange}
+          />
+          <input
+            placeholder="password confirmation"
+            type="password"
+            name="password_confirmation"
+            value={password_confirmation}
+            onChange={this.handleChange}
+          />
+        
+          <button placeholder="submit" type="submit">
+            Sign Up
+          </button>
+      
+        </form>
+      </div>
+    );
+  }
+}
+export default Signup;
+```
+
+- Update the App component to pass the user's logged in status to components
+
+```jsx
+// client/src/App.js
+
+...
+
+import Home from './components/Home'
+import Login from './components/registrations/Login'
+import Signup from './components/registrations/Signup'
+
+...
+
+render() {
+    return (
+      <div>
+        <BrowserRouter>
+          <Switch>
+            <Route 
+              exact path='/' 
+              render={props => (
+              <Home {...props} loggedInStatus={this.state.isLoggedIn}/>
+              )}
+            />
+            <Route 
+              exact path='/login' 
+              render={props => (
+              <Login {...props} handleLogin={this.handleLogin} loggedInStatus={this.state.isLoggedIn}/>
+              )}
+            />
+            <Route 
+              exact path='/signup' 
+              render={props => (
+              <Signup {...props} handleLogin={this.handleLogin} loggedInStatus={this.state.isLoggedIn}/>
+              )}
+            />
+          </Switch>
+        </BrowserRouter>
+      </div>
+    );
+  }
+}
+```
+
+- Update the Login and Signup methods to use the data passed from the App component
+
+```jsx
+//client/src/components/registrations/Login.js
+
+import React, { Component } from 'react';
+import axios from 'axios'
+import {Link} from 'react-router-dom'
+class Login extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { 
+      username: '',
+      email: '',
+      password: '',
+      errors: ''
+     };
+  }
+handleChange = (event) => {
+    const {name, value} = event.target
+    this.setState({
+      [name]: value
+    })
+  };
+handleSubmit = (event) => {
+    event.preventDefault()
+    const {username, email, password} = this.state
+let user = {
+      username: username,
+      email: email,
+      password: password
+    }
+    
+axios.post('http://localhost:3001/login', {user}, {withCredentials: true})
+    .then(response => {
+      if (response.data.logged_in) {
+        this.props.handleLogin(response.data)
+        this.redirect()
+      } else {
+        this.setState({
+          errors: response.data.errors
+        })
+      }
+    })
+    .catch(error => console.log('api errors:', error))
+  };
+redirect = () => {
+    this.props.history.push('/')
+  }
+handleErrors = () => {
+    return (
+      <div>
+        <ul>
+        {this.state.errors.map(error => {
+        return <li key={error}>{error}</li>
+          })}
+        </ul>
+      </div>
+    )
+  }
+render() {
+    const {username, email, password} = this.state
+return (
+      <div>
+        <h1>Log In</h1>
+        <form onSubmit={this.handleSubmit}>
+          <input
+            placeholder="username"
+            type="text"
+            name="username"
+            value={username}
+            onChange={this.handleChange}
+          />
+          <input
+            placeholder="email"
+            type="text"
+            name="email"
+            value={email}
+            onChange={this.handleChange}
+          />
+          <input
+            placeholder="password"
+            type="password"
+            name="password"
+            value={password}
+            onChange={this.handleChange}
+          />
+          <button placeholder="submit" type="submit">
+            Log In
+          </button>
+          <div>
+           or <Link to='/signup'>sign up</Link>
+          </div>
+          
+        </form>
+        <div>
+          {
+            this.state.errors ? this.handleErrors() : null
+          }
+        </div>
+      </div>
+    );
+  }
+}
+export default Login;
+```
+
+```jsx
+//client/src/components/registrations/Signup.js
+
+import React, { Component } from 'react';
+import axios from 'axios'
+class Signup extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { 
+      username: '',
+      email: '',
+      password: '',
+      password_confirmation: '',
+      errors: ''
+     };
+  }
+handleChange = (event) => {
+    const {name, value} = event.target
+    this.setState({
+      [name]: value
+    })
+  };
+handleSubmit = (event) => {
+    event.preventDefault()
+    const {username, email, password, password_confirmation} = this.state
+    let user = {
+      username: username,
+      email: email,
+      password: password,
+      password_confirmation: password_confirmation
+    }
+axios.post('http://localhost:3001/users', {user}, {withCredentials: true})
+    .then(response => {
+      if (response.data.status === 'created') {
+        this.props.handleLogin(response.data)
+        this.redirect()
+      } else {
+        this.setState({
+          errors: response.data.errors
+        })
+      }
+    })
+    .catch(error => console.log('api errors:', error))
+  };
+redirect = () => {
+    this.props.history.push('/')
+  }
+handleErrors = () => {
+    return (
+      <div>
+        <ul>{this.state.errors.map((error) => {
+          return key={error}>{error}</li>
+        })}
+        </ul> 
+      </div>
+    )
+  }
+render() {
+    const {username, email, password, password_confirmation} = this.state
+return (
+      <div>
+        <h1>Sign Up</h1>
+       <form onSubmit={this.handleSubmit}>
+          <input
+            placeholder="username"
+            type="text"
+            name="username"
+            value={username}
+            onChange={this.handleChange}
+          />
+          <input
+            placeholder="email"
+            type="text"
+            name="email"
+            value={email}
+            onChange={this.handleChange}
+          />
+          <input 
+            placeholder="password"
+            type="password"
+            name="password"
+            value={password}
+            onChange={this.handleChange}
+          />
+          <input
+            placeholder="password confirmation"
+            type="password"
+            name="password_confirmation"
+            value={password_confirmation}
+            onChange={this.handleChange}
+          />
+        
+          <button placeholder="submit" type="submit">
+            Sign Up
+          </button>
+      
+        </form>
+        <div>
+          {
+            this.state.errors ? this.handleErrors() : null
+          }
+        </div>
+      </div>
+    );
+  }
+}
+export default Signup;
 ```
