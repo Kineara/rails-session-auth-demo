@@ -1,67 +1,57 @@
-import React, { Component } from 'react';
-import axios from 'axios'
-class Signup extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { 
-      username: '',
-      email: '',
-      password: '',
-      password_confirmation: '',
-      errors: ''
-     };
+import React, { useState } from 'react';
+
+function Signup() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [errors, setErrors] = useState('');
+
+  function handleSubmit(event) {
+    event.preventDefault();
   }
-handleChange = (event) => {
-    const {name, value} = event.target
-    this.setState({
-      [name]: value
-    })
-  };
-handleSubmit = (event) => {
-    event.preventDefault()
-  };
-render() {
-    const {username, email, password, password_confirmation} = this.state
-return (
-      <div>
-        <h1>Sign Up</h1>
-        <form onSubmit={this.handleSubmit}>
-          <input
-            placeholder="username"
-            type="text"
-            name="username"
-            value={username}
-            onChange={this.handleChange}
-          />
-          <input
-            placeholder="email"
-            type="text"
-            name="email"
-            value={email}
-            onChange={this.handleChange}
-          />
-          <input 
-            placeholder="password"
-            type="password"
-            name="password"
-            value={password}
-            onChange={this.handleChange}
-          />
-          <input
-            placeholder="password confirmation"
-            type="password"
-            name="password_confirmation"
-            value={password_confirmation}
-            onChange={this.handleChange}
-          />
+
+  return (
+    <>
+      <h1>Sign Up</h1>
+
+      <form onSubmit={() => handleSubmit()}>
+        <input 
+          placeholder="username"
+          type="text"
+          name="username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+        />
+        <input 
+          placeholder="email"
+          type="email"
+          name="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <input
+          placeholder="password"
+          type="password"
+          name="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+        <input 
+          placeholder="confirm password"
+          type="password"
+          name="passwordConfirmation"
+          value={passwordConfirmation}
+          onChange={(event) => setPasswordConfirmation(event.target.value)}
+        />
+
+        <button placeholder="submit" type="submit">
+          Sign Up
+        </button>
         
-          <button placeholder="submit" type="submit">
-            Sign Up
-          </button>
-      
-        </form>
-      </div>
-    );
-  }
+      </form>
+    </>
+  )
 }
+
 export default Signup;
