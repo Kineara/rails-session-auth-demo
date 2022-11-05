@@ -9,6 +9,8 @@ function App() {
   const [user, setUser] = useState({});
   const navigate = useNavigate();
 
+  console.log(user);
+
   function handleLogin(data) {
     // data = response from server
     console.log('handle login fired');
@@ -18,8 +20,19 @@ function App() {
   };
 
   function handleLogout() {
-    setLoggedIn(false);
-    setUser({});
+    fetch('http://localhost:3001/logout', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'include'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        setLoggedIn(false);
+        setUser({});
+        navigate('/');
+      })
   };
 
   useEffect(() => {
@@ -38,7 +51,7 @@ function App() {
 
   return (
     <Routes>
-      <Route exact path="/" element={<Home loggedInStatus={loggedIn} />} />
+      <Route exact path="/" element={<Home handleLogout={handleLogout} loggedInStatus={loggedIn} />} />
       <Route
         exact
         path="/login"
