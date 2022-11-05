@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Login({ handleLogin, loggedInStatus }) {
 
@@ -7,6 +7,13 @@ function Login({ handleLogin, loggedInStatus }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loggedInStatus) {
+      navigate('/')
+    }
+  }, [loggedInStatus, navigate])
 
   function handleSubmit(event) {
     event.preventDefault()

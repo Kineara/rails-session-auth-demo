@@ -760,3 +760,16 @@ function Signup({ handleLogin, loggedInStatus }) {
 
 export default Signup;
 ```
+
+- Add a hook to the Login component to automatically redirect the user to the homepage if they're already logged in
+
+```jsx
+// client/src/components/registrations/Login.js
+
+  useEffect(() => {
+    if (loggedInStatus) {
+      navigate('/')
+    }
+  }, [loggedInStatus, navigate])
+  ```
+  
