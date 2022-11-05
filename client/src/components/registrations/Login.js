@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-function Login() {
+function Login({ handleLogin, loggedInStatus }) {
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -10,10 +10,46 @@ function Login() {
 
   function handleSubmit(event) {
     event.preventDefault()
+
+    fetch('http://localhost:3001/login', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        credentials: 'include'
+      },
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: password
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.logged_in) {
+          handleLogin(data);
+        } else {
+          setErrors({
+            errors: data.errors
+          })
+        }
+      })
+      .catch(error => console.log('api errors: ', error));
   };
+
+  function handleErrors() {
+    return (
+      <>
+        <ul>
+          {errors.localeCompare(error => <li key={error}>{error}</li>)}
+        </ul>
+      </>
+    )
+  }
 
   return (
     <>
+      <h1>Log In</h1>
+
       <form onSubmit={() => handleSubmit()}>
         <input 
           placeholder="username"
@@ -45,6 +81,9 @@ function Login() {
           or <Link to='/signup'>Sign Up</Link>
         </div>
       </form>
+      <div>
+        { errors ? handleErrors() : null }
+      </div>
     </>
   )
 }

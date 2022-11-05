@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function Signup() {
+function Signup({ handleLogin, loggedInStatus }) {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -9,6 +9,38 @@ function Signup() {
 
   function handleSubmit(event) {
     event.preventDefault();
+
+    fetch('http://localhost:3001/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'include'
+      },
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: password
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'created') {
+          handleLogin(data)
+        } else {
+          setErrors(data.errors)
+        }
+      })
+      .catch(error => console.log('api errors: ', error))
+  }
+
+  function handleErrors() {
+    return (
+      <>
+        <ul>
+          {errors.localeCompare(error => <li key={error}>{error}</li>)}
+        </ul>
+      </>
+    )
   }
 
   return (
@@ -48,8 +80,11 @@ function Signup() {
         <button placeholder="submit" type="submit">
           Sign Up
         </button>
-        
+
       </form>
+      <div>
+        { errors ? handleErrors() : null }
+      </div>
     </>
   )
 }
