@@ -508,22 +508,45 @@ Import the components:
 ```jsx
 // client/src/App.js
 
-...
-
+import React, { useState, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/registrations/Login";
 import Signup from "./components/registrations/Signup";
 
-...
-```
+function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [user, setUser] = useState({});
+  const navigate = useNavigate();
 
-Update the routes:
+  function handleLogin(data) {
+    // data = response from server
+    console.log('handle login fired');
+    setLoggedIn(true);
+    setUser(data.user);
+    navigate('/');
+  };
 
-```jsx
-// client/src/App.js
+  function handleLogout() {
+    setLoggedIn(false);
+    setUser({});
+  };
 
-...
+  useEffect(() => {
+    fetch("http://localhost:3001/logged_in", { credentials: "include" })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data);
+      if (data.logged_in) {
+        handleLogin(data);
+      } else {
+        handleLogout();
+      }
+    })
+    .catch((error) => console.log("api errors: ", error));
+  }, []);
 
+  return (
     <Routes>
       <Route exact path="/" element={<Home loggedInStatus={loggedIn} />} />
       <Route
@@ -537,8 +560,203 @@ Update the routes:
         element={<Signup handleLogin={handleLogin} loggedInStatus={loggedIn} />}
       />
     </Routes>
+  );
+}
 
-...
-
+export default App;
 ```
 
+- Update the Login and Signup components to use the data passed from the App component
+
+```jsx
+// client/src/components/registrations/Login.js
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+function Login({ handleLogin, loggedInStatus }) {
+
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState('');
+
+  function handleSubmit(event) {
+    event.preventDefault()
+
+    fetch('http://localhost:3001/login', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        credentials: 'include'
+      },
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: password
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.logged_in) {
+          handleLogin(data);
+        } else {
+          setErrors({
+            errors: data.errors
+          })
+        }
+      })
+      .catch(error => console.log('api errors: ', error));
+  };
+
+  function handleErrors() {
+    return (
+      <>
+        <ul>
+          {errors.localeCompare(error => <li key={error}>{error}</li>)}
+        </ul>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <h1>Log In</h1>
+
+      <form onSubmit={() => handleSubmit()}>
+        <input 
+          placeholder="username"
+          type="text"
+          name="username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+        />
+        <input 
+          placeholder="email"
+          type="text"
+          name="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <input 
+          placeholder="password"
+          type="password"
+          name="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+
+        <button placeholder="submit" type="submit">
+          Log In 
+        </button>
+
+        <div>
+          or <Link to='/signup'>Sign Up</Link>
+        </div>
+      </form>
+      <div>
+        { errors ? handleErrors() : null }
+      </div>
+    </>
+  )
+}
+
+export default Login;
+```
+
+```jsx
+// client/src/components/registrations/Signup.js
+
+import React, { useState } from 'react';
+
+function Signup({ handleLogin, loggedInStatus }) {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [errors, setErrors] = useState('');
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    fetch('http://localhost:3001/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'include'
+      },
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: password
+      })
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'created') {
+          handleLogin(data)
+        } else {
+          setErrors(data.errors)
+        }
+      })
+      .catch(error => console.log('api errors: ', error))
+  }
+
+  function handleErrors() {
+    return (
+      <>
+        <ul>
+          {errors.localeCompare(error => <li key={error}>{error}</li>)}
+        </ul>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <h1>Sign Up</h1>
+
+      <form onSubmit={() => handleSubmit()}>
+        <input 
+          placeholder="username"
+          type="text"
+          name="username"
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+        />
+        <input 
+          placeholder="email"
+          type="email"
+          name="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
+        <input
+          placeholder="password"
+          type="password"
+          name="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+        <input 
+          placeholder="confirm password"
+          type="password"
+          name="passwordConfirmation"
+          value={passwordConfirmation}
+          onChange={(event) => setPasswordConfirmation(event.target.value)}
+        />
+
+        <button placeholder="submit" type="submit">
+          Sign Up
+        </button>
+
+      </form>
+      <div>
+        { errors ? handleErrors() : null }
+      </div>
+    </>
+  )
+}
+
+export default Signup;
+```
