@@ -548,7 +548,7 @@ function App() {
 
   return (
     <Routes>
-      <Route exact path="/" element={<Home loggedInStatus={loggedIn} />} />
+      <Route exact path="/" element={<Home handleLogout={handleLogout} loggedInStatus={loggedIn} />} />
       <Route
         exact
         path="/login"
@@ -772,4 +772,29 @@ export default Signup;
     }
   }, [loggedInStatus, navigate])
   ```
-  
+
+- Update the Home component to add a Log Out button when the user is logged in
+
+```jsx
+// client/src/components/Home.js
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+function Home({ handleLogout, loggedInStatus }) {
+
+  return (
+    <>
+      <Link to='/login'>Log In</Link>
+      <br />
+      <Link to='/signup'>Sign Up</Link>
+      <br />
+      { loggedInStatus ? <Link to='/logout' onClick={() => handleLogout()}>Log Out</Link> : null}
+    </>
+  );
+};
+
+export default Home;
+```
+
+- Logout stuff currently WIP
