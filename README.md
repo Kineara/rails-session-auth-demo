@@ -269,7 +269,7 @@ ReactDOM.render(<App />, document.getElementById("root"));
 - Add dependencies:
 
 ```bash
-  yarn add axios && yarn add react-router && yarn add react-router-dom
+  yarn add axios && yarn add react-router@5.3.4 && yarn add react-router-dom@5.3.4
 ```
 
 ## App Logic
